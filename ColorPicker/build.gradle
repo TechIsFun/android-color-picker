@@ -3,14 +3,16 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.7.+'
+        classpath 'com.android.tools.build:gradle:0.5.+'
+        classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.+'
     }
 }
 apply plugin: 'android-library'
+apply plugin: 'android-test'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-group = 'com.github.android'
+group = 'com.github.techisfun'
 version = '0.1'
 ext.packaging = 'jar'
 
@@ -29,19 +31,24 @@ android {
         versionCode 1
         versionName "1.0"
     }
-    buildTypes {
+
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
-    }
+
 }
 
 dependencies {
     compile 'com.android.support:support-v4:18.0.0'
-    compile 'com.android.support:appcompat-v7:+'
+    //compile 'com.android.support:appcompat-v7:+'
+
+    testCompile 'junit:junit:4.10'
+    testCompile 'org.robolectric:robolectric:2.1.+'
+    testCompile 'com.squareup:fest-android:1.0.+'
 }
 
+/*
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from 'build/docs/javadoc'
@@ -102,4 +109,5 @@ uploadArchives {
         }
     }
 }
+*/
 
