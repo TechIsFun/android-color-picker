@@ -1,10 +1,13 @@
 buildscript {
+
     repositories {
         mavenCentral()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:0.5.+'
-        classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.+'
+        classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.1-SNAPSHOT'
     }
 }
 apply plugin: 'android-library'
@@ -14,8 +17,17 @@ apply plugin: 'signing'
 
 group = 'com.github.techisfun'
 version = '0.1'
-ext.packaging = 'jar'
 
+configurations {
+    archives {
+        extendsFrom configurations.default
+    }
+}
+
+signing {
+    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
 
 repositories {
     mavenCentral()
@@ -32,10 +44,10 @@ android {
         versionName "1.0"
     }
 
-        release {
-            runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
+    release {
+        runProguard false
+        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+    }
 
 }
 
@@ -48,66 +60,43 @@ dependencies {
     testCompile 'com.squareup:fest-android:1.0.+'
 }
 
-/*
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from 'build/docs/javadoc'
-}
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
-artifacts {
-    archives jar
-
-    archives javadocJar
-    archives sourcesJar
-}
-
-signing {
-    sign configurations.archives
-}
-
 uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+    configuration = configurations.archives
+    repositories.mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
                 authentication(userName: sonatypeUsername, password: sonatypePassword)
+        }
+
+        pom.project {
+            name 'AndroidColorPicker'
+            packaging 'aar'
+            description 'A very simple color picker for Android apps'
+            url 'https://github.com/TechIsFun/android-color-picker'
+
+            scm {
+                url 'scm:git@github.com:TechIsFun/android-color-picker.git'
+                connection 'scm:git@github.com:TechIsFun/android-color-picker.git'
+                developerConnection 'scm:git@github.com:TechIsFun/android-color-picker.git'
             }
 
-            pom.project {
-                name 'AndroidColorPicker'
-                packaging 'jar'
-                description 'A very simple color picker for Android apps'
-                url ''
-
-                scm {
-                    url 'scm:git@github.com:xxx/xxx.git'
-                    connection 'scm:git@github.com:xxx/xxx.git'
-                    developerConnection 'scm:git@github.com:xxx/xxx.git'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
                 }
+            }
 
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'TechIsFun'
-                        name 'Andrea Maglie'
-                    }
+            developers {
+                developer {
+                    id 'TechIsFun'
+                    name 'Andrea Maglie'
                 }
             }
         }
     }
 }
-*/
+
 
